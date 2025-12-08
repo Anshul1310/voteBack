@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 // Database Connection
 // Replace <password> with your actual MongoDB password
-const MONGO_URI = 'mongodb+srv://anshul:anshul@indulge.jbvxebp.mongodb.net/?appName=indulge';
+const MONGO_URI = 'mongodb+srv://anshul:anshul@cluster0.fjmrsjw.mongodb.net/?appName=Cluster0';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
