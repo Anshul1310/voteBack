@@ -23,7 +23,7 @@ mongoose.connect(MONGO_URI)
 // Routes
 app.use('/api', votingRoutes);
 
-app.post('/seed', async (req, res) => {
+app.get('/seed', async (req, res) => {
   const candidates = [
     { name: "A", roll: "106121001" },
     { name: "B", roll: "106121045" },
@@ -36,7 +36,7 @@ app.post('/seed', async (req, res) => {
 });
 
 
-app.get('/api/reset', async (req, res) => {
+app.get('/reset', async (req, res) => {
   
   // --- SECURITY: Simple Password Check ---
   // You don't want random people wiping your database!
