@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors'); // Allows React to talk to Node
 const votingRoutes = require('./routes/votingRoutes');
-const { Candidate } = require('./Schemas');
+const { Candidate, Voter } = require('./Schemas');
 const path = require('path');
 const app = express();
 const PORT = 5000;
@@ -36,59 +36,30 @@ app.post('/seed', async (req, res) => {
 });
 
 
-// GET /api/voters/:candidateRolls
-// Example usage: GET /api/voters/2024001,2024005,2024099
-app.get('/api/voters/:candidateRolls', async (req, res) => {
+app.get('/api/reset', async (req, res) => {
+  
+  // --- SECURITY: Simple Password Check ---
+  // You don't want random people wiping your database!
+
+  // ---------------------------------------
+
   try {
-    const { candidateRolls } = req.params;
-
-    // 1. Convert the comma-separated string into an array
-    // Input: "101,102" -> Output: ["101", "102"]
-    const candidateList = candidateRolls.split(',').map(roll => roll.trim());
-
-    if (candidateList.length === 0) {
-      return res.status(400).json({ error: "No candidate roll numbers provided" });
-    }
-
-    // 2. Fetch votes from the database
-    // We look for any vote where the 'candidateRollNumber' matches our list
-    const votes = await prisma.vote.findMany({
-      where: {
-        candidateRollNumber: {
-          in: candidateList 
-        }
-      },
-      select: {
-        voterRollNumber: true,
-        candidateRollNumber: true
-      }
-    });
-
-    // 3. Group the results (Optional but recommended)
-    // This turns a flat list into a nice dictionary: { "101": ["201", "202"], "102": ["205"] }
-    const groupedResults = {};
-
-    // Initialize keys for all requested candidates (so even those with 0 votes show up)
-    candidateList.forEach(c => groupedResults[c] = []);
-
-    // Fill in the voters
-    votes.forEach(vote => {
-      if (groupedResults[vote.candidateRollNumber]) {
-        groupedResults[vote.candidateRollNumber].push(vote.voterRollNumber);
-      }
-    });
-
-    return res.json({
+    // 1. Delete ALL documents in the 'votes' collection
+    // Passing an empty object {} selects everything.
+    await Voter.deleteMany({});
+    await Candidate.deleteMany({})
+    // 2. Respond with success
+    res.status(200).json({
       success: true,
-      data: groupedResults
+      message: "Election reset successful. All votes have been cleared.",
+      deletedCount: result.deletedCount // Shows how many votes were removed
     });
 
-  } catch (error) {
-    console.error("Error fetching voters:", error);
+  } catch (err) {
+    console.error("Reset Error:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 app.get('/test', async (req, res) => {
   
