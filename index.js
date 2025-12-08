@@ -36,6 +36,60 @@ app.post('/seed', async (req, res) => {
 });
 
 
+// GET /api/voters/:candidateRolls
+// Example usage: GET /api/voters/2024001,2024005,2024099
+app.get('/api/voters/:candidateRolls', async (req, res) => {
+  try {
+    const { candidateRolls } = req.params;
+
+    // 1. Convert the comma-separated string into an array
+    // Input: "101,102" -> Output: ["101", "102"]
+    const candidateList = candidateRolls.split(',').map(roll => roll.trim());
+
+    if (candidateList.length === 0) {
+      return res.status(400).json({ error: "No candidate roll numbers provided" });
+    }
+
+    // 2. Fetch votes from the database
+    // We look for any vote where the 'candidateRollNumber' matches our list
+    const votes = await prisma.vote.findMany({
+      where: {
+        candidateRollNumber: {
+          in: candidateList 
+        }
+      },
+      select: {
+        voterRollNumber: true,
+        candidateRollNumber: true
+      }
+    });
+
+    // 3. Group the results (Optional but recommended)
+    // This turns a flat list into a nice dictionary: { "101": ["201", "202"], "102": ["205"] }
+    const groupedResults = {};
+
+    // Initialize keys for all requested candidates (so even those with 0 votes show up)
+    candidateList.forEach(c => groupedResults[c] = []);
+
+    // Fill in the voters
+    votes.forEach(vote => {
+      if (groupedResults[vote.candidateRollNumber]) {
+        groupedResults[vote.candidateRollNumber].push(vote.voterRollNumber);
+      }
+    });
+
+    return res.json({
+      success: true,
+      data: groupedResults
+    });
+
+  } catch (error) {
+    console.error("Error fetching voters:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 app.get('/test', async (req, res) => {
   
   res.json({ message: "Database seeded!" });
