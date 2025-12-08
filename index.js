@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors'); // Allows React to talk to Node
 const votingRoutes = require('./routes/votingRoutes');
 const { Candidate } = require('./Schemas');
-
+const path = require('path');
 const app = express();
 const PORT = 5000;
 
@@ -41,7 +41,7 @@ app.get('/test', async (req, res) => {
   res.json({ message: "Database seeded!" });
 });
 
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
