@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/frontvote/static/css/main.fdd53b6a.css",
+    "main.js": "/frontvote/static/js/main.a9fef4e7.js",
+    "index.html": "/frontvote/index.html",
+    "main.fdd53b6a.css.map": "/frontvote/static/css/main.fdd53b6a.css.map",
+    "main.a9fef4e7.js.map": "/frontvote/static/js/main.a9fef4e7.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fdd53b6a.css",
+    "static/js/main.a9fef4e7.js"
+  ]
+}
